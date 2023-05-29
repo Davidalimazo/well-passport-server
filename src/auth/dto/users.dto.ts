@@ -11,6 +11,16 @@ export interface UpdateDto {
   image: string;
 }
 
+export const updateUserSchema = Joi.object({
+  userId: Joi.string(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+
+  password: Joi.string().required(),
+
+  image: Joi.string().required(),
+});
+
 export enum Role {
   ADMIN,
   USER,
@@ -26,15 +36,11 @@ export interface IAccount {
 
   lastName: string;
 
-  password?: string;
-
   image?: string;
 
   email: string;
 
   role?: string;
-
-  createdorId: string;
 }
 export interface ILogin {
   password: string;
@@ -47,15 +53,9 @@ export const createuserSchema = Joi.object({
 
   lastName: Joi.string().required(),
 
-  password: Joi.string(),
-
-  image: Joi.string().required(),
-
   email: Joi.string().email().required(),
 
   role: Joi.string().valid('ADMIN', 'USER', 'CLIENT').required(),
-
-  createdorId: Joi.string().required(),
 });
 
 export const loginSchema = Joi.object({
@@ -77,8 +77,6 @@ export interface IResponse {
   email: string;
 
   role?: string;
-
-  createdorId: string;
 }
 
 export class SerializeUser {
@@ -93,8 +91,6 @@ export class SerializeUser {
   email: string;
 
   role?: string;
-
-  createdorId: string;
 
   @Exclude()
   password: string;

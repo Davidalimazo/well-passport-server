@@ -11,7 +11,7 @@ enum Role {
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   userId: string;
 
   @Prop({ required: true })
@@ -33,7 +33,7 @@ export class User {
   role: string;
 
   @Prop()
-  createdorId: string;
+  creatorId: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);

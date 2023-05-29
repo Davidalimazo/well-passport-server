@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailNotification } from 'src/utils/registerMail';
 import { ConfigService } from '@nestjs/config';
+import mongoose, { isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,10 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async getUserById(userId: string): Promise<IResponse | null> {
-    return this.authRepository.findOneByUserId(userId);
+  async getUserById(userId: string): Promise<any> {
+    const user = await this.authRepository.findOneByUserId(userId);
+    if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user;
   }
   async login(data: ILogin): Promise<any> {
     const user = await this.authRepository.findUserByEmail(data.email);
@@ -28,7 +31,25 @@ export class AuthService {
     if (!hashed)
       return new HttpException('Invalid password', HttpStatus.FORBIDDEN);
 
-    const payload = { user };
+    delete user.password;
+
+    const payload = {
+      //@ts-ignore
+      createdAt: user.createdAt,
+      creatorId: user.creatorId,
+      email: user.email,
+      firstName: user.firstName,
+      image: user.image,
+      lastName: user.lastName,
+      role: user.role,
+      //@ts-ignore
+      updatedAt: user.updatedAt,
+      userId: user.userId,
+      //@ts-ignore
+      __v: user._v,
+      //@ts-ignore
+      _id: user._id,
+    };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -41,7 +62,7 @@ export class AuthService {
   async getAllUsers(): Promise<IResponse[] | null> {
     return this.authRepository.findAll({});
   }
-  async createUser(data: IAccount): Promise<IResponse | any> {
+  async createUser(data: IAccount, adminId: string): Promise<IResponse | any> {
     const exist = await this.authRepository.findUserByEmail(data.email);
 
     if (exist)
@@ -60,7 +81,7 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
-      createdorId: data.createdorId,
+      creatorId: adminId,
       image: data.image ? data.image : '',
       password: hashed,
       role: data.role,
@@ -79,17 +100,24 @@ export class AuthService {
       data.firstName,
     );
 
-    const payload = { newUser };
-
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      message: 'Account created successfully',
+      token: '00',
     };
   }
 
-  async updateUser(
-    userId: string,
-    user: PartialUsers,
-  ): Promise<IResponse | null> {
-    return this.authRepository.updateOne(userId, user);
+  async updateUser(userId: string, user: PartialUsers): Promise<any> {
+    if (isValidObjectId(userId)) {
+      if (user.password) {
+        const salt = await bcrypt.genSalt(10);
+
+        const hashed = await bcrypt.hash(user.password, salt);
+        user.password = hashed;
+      }
+      const res = await this.authRepository.updateOne(userId, user);
+      if (!res) new HttpException('User not found', HttpStatus.NOT_FOUND);
+      return res;
+    }
+    return new HttpException('Not a valid user Id', HttpStatus.BAD_REQUEST);
   }
 }

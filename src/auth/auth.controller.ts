@@ -5,10 +5,11 @@ import {
   Param,
   Patch,
   Post,
-  UseInterceptors,
   UsePipes,
-  ClassSerializerInterceptor,
   UseGuards,
+  Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
@@ -21,6 +22,7 @@ import {
   UpdateDto,
   createuserSchema,
   loginSchema,
+  updateUserSchema,
 } from './dto/users.dto';
 import { JoiValidationPipe } from 'src/utils/validator';
 import { AuthGuard } from './auth.guard';
@@ -35,6 +37,7 @@ export class AuthController {
     return this.authService.getUserById(userId);
   }
   @Public()
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   @UsePipes(new JoiValidationPipe(loginSchema))
   login(@Body() data: ILogin): Promise<any> {
@@ -42,19 +45,25 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
   @Get()
   getAllUser(): Promise<IResponse[] | null> {
     return this.authService.getAllUsers();
   }
 
   @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
   @Post()
   @UsePipes(new JoiValidationPipe(createuserSchema))
-  createUser(@Body() user: IAccount): Promise<IResponse | null> {
-    return this.authService.createUser(user);
+  createUser(
+    @Request() request,
+    @Body() user: IAccount,
+  ): Promise<IResponse | null> {
+    return this.authService.createUser(user, request.user?._id);
   }
 
   @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
   @Patch(':userId')
   updateUser(
     @Param('userId') userId: string,

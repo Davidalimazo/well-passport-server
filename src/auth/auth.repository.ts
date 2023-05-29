@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UsersDocument } from './schema/users.schema';
-import mongoose, { Model, FilterQuery } from 'mongoose';
+import mongoose, { Model, FilterQuery, isValidObjectId } from 'mongoose';
 import { IResponse, IUsers } from './dto/users.dto';
 
 @Injectable()

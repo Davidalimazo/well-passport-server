@@ -1,39 +1,37 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
-export type ClientDocument = Client & Document;
+export type ReportDocument = Report & Document;
 
 @Schema({ timestamps: true })
-export class Client {
+export class Report {
   @Prop({ required: true, unique: true })
-  clientId: string;
-
-  @Prop({ required: true })
-  name: string;
-
-  @Prop({ required: true })
-  contactPerson: string;
-
-  @Prop({ required: true })
-  mobile: string;
-
-  @Prop()
-  image: string;
-
-  @Prop({ required: true, unique: true })
-  email: string;
-
-  @Prop({ required: true })
-  address: string;
+  reportId: string;
 
   @Prop({ required: true })
   adminId: string;
 
   @Prop({ required: true })
-  ownerId: string;
+  fieldId: string;
+
+  @Prop({ required: true })
+  clientId: string;
+
+  @Prop({ required: true })
+  projectId: string;
+
+  @Prop({ required: true })
+  wellId: string;
+
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
+  author: string;
 
   @Prop()
-  website: string;
+  image: string;
+
 }
 
-export const ClientSchema = SchemaFactory.createForClass(Client);
+export const ReportSchema = SchemaFactory.createForClass(Report);

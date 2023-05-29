@@ -5,7 +5,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { ClientModule } from './client/client.module';
+import { FieldModule } from './field/field.module';
+import { WellModule } from './well/well.module';
+import { ProjectModule } from './project/project.module';
+import { ReportModule } from './report/report.module';
+import { RecycleModule } from './recycle/recycle.module';
 import configuration from 'config/configuration';
+
 
 
 
@@ -20,7 +26,7 @@ import configuration from 'config/configuration';
       uri:configService.get('database.uri'),
       dbName:configService.get("database.dbName")
     })
-  }), AuthModule, ClientModule],
+  }), AuthModule, ClientModule, FieldModule, WellModule, ProjectModule, ReportModule, RecycleModule],
   controllers: [AppController],
   providers: [AppService],
 })
