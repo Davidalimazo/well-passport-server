@@ -51,7 +51,6 @@ export class AuthController {
     return this.authService.getAllUsers();
   }
 
-  @Public()
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post()
