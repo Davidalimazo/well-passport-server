@@ -31,6 +31,12 @@ export interface IUsers extends User {}
 
 export type PartialUsers = Partial<User>;
 
+export interface changePasswordDto extends PartialUsers {
+  oldPassword: string;
+
+  newPassword: string;
+}
+
 export interface IAccount {
   firstName: string;
 

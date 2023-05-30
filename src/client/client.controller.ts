@@ -33,11 +33,12 @@ export class ClientController {
   }
 
   @Post()
-  @UsePipes(new JoiValidationPipe(createClientSchema))
+  // @UsePipes(new JoiValidationPipe(createClientSchema))
   createUser(
     @Request() request,
     @Body() client: IClientCreateRequest,
   ): Promise<Client | null> {
+    console.log(client);
     return this.clientService.createUser(client, request.user._id);
   }
 

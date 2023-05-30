@@ -20,6 +20,7 @@ import {
   IResponse,
   IUsers,
   UpdateDto,
+  changePasswordDto,
   createuserSchema,
   loginSchema,
   updateUserSchema,
@@ -60,6 +61,16 @@ export class AuthController {
     @Body() user: IAccount,
   ): Promise<IResponse | null> {
     return this.authService.createUser(user);
+  }
+
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Patch('changepassword/:userId')
+  changePassword(
+    @Param('userId') userId: string,
+    @Body() user: changePasswordDto,
+  ): Promise<any> {
+    return this.authService.changePassword(userId, user);
   }
 
   @UseGuards(AuthGuard)

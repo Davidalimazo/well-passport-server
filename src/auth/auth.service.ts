@@ -2,7 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { User } from './schema/users.schema';
 import { v4 as uuidv4 } from 'uuid';
-import { IAccount, ILogin, IResponse, PartialUsers } from './dto/users.dto';
+import {
+  IAccount,
+  ILogin,
+  IResponse,
+  PartialUsers,
+  changePasswordDto,
+} from './dto/users.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailNotification } from 'src/utils/registerMail';
@@ -116,6 +122,27 @@ export class AuthService {
       }
       const res = await this.authRepository.updateOne(userId, user);
       if (!res) new HttpException('User not found', HttpStatus.NOT_FOUND);
+      return {
+        message: 'Account Updated successfully',
+        token: '00',
+      };
+    }
+    return new HttpException('Not a valid user Id', HttpStatus.BAD_REQUEST);
+  }
+  async changePassword(userId: string, user: changePasswordDto): Promise<any> {
+    if (isValidObjectId(userId)) {
+      const salt = await bcrypt.genSalt(10);
+
+      const exist = await this.authRepository.findOneByObjectId(userId);
+
+      if (!exist)
+        return new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+      const hashed = await bcrypt.hash(user.newPassword, salt);
+      exist.password = hashed;
+
+      const res = await this.authRepository.updateOne(userId, exist);
+
       return {
         message: 'Account Updated successfully',
         token: '00',
