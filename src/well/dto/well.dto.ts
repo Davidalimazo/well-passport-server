@@ -28,7 +28,7 @@ export interface IWellCreateRequest {
 
   fieldId: string;
 
-  adminId: string;
+  wellType: string;
 
   clientId: string;
 
@@ -61,6 +61,8 @@ export const createWellSchema = Joi.object({
   longitude: Joi.number().required(),
 
   latitude: Joi.number().required(),
+
+  wellType: Joi.string().required(),
 
   adminId: Joi.string().required(),
 

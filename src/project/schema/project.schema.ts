@@ -21,6 +21,9 @@ export class Project {
   clientId: string;
 
   @Prop({ required: true })
+  status: string;
+
+  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

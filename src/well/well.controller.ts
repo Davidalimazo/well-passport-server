@@ -30,19 +30,19 @@ export class WellController {
   getAllClientWells(
     @Param('clientId') clientId: string,
   ): Promise<Well[] | null> {
-    console.log(clientId);
+ 
     return this.wellService.getClientWells(clientId);
   }
 
   @Delete('client/:clientId')
   deleteAllWellByClientId(@Param('clientId') clientId: string): Promise<any> {
-    console.log(clientId);
+    
     return this.wellService.deleteAllWellClientById(clientId);
   }
 
   @Get('field/:fieldId')
   getAllFieldWells(@Param('fieldId') fieldId: string): Promise<Well[] | null> {
-    return this.wellService.getClientWells(fieldId);
+    return this.wellService.getFieldWells(fieldId);
   }
 
   @Delete('client/:fieldId')
@@ -56,12 +56,12 @@ export class WellController {
   }
 
   @Post()
-  @UsePipes(new JoiValidationPipe(createWellSchema))
+  // @UsePipes(new JoiValidationPipe(createWellSchema))
   createUser(
     @Request() request,
     @Body() well: IWellCreateRequest,
   ): Promise<Well | null> {
-    return this.wellService.createUser(well);
+    return this.wellService.createUser(well, request.user._id);
   }
 
   @Delete(':wellId')

@@ -31,13 +31,17 @@ export class WellService {
   async getClientWells(clientId: string): Promise<Well[] | null> {
     return this.wellRepository.findWellByClientId(clientId);
   }
+
+  async getFieldWells(fieldId: string): Promise<Well[] | null> {
+    return this.wellRepository.findWellByFieldId(fieldId);
+  }
   async getAllUsers(): Promise<Well[] | null> {
     return this.wellRepository.findAll({});
   }
-  async createUser(data: IWellCreateRequest): Promise<Well | null> {
+  async createUser(data: IWellCreateRequest, adminId:string): Promise<Well | null> {
     return this.wellRepository.create({
       wellId: uuidv4(),
-      adminId: data.adminId,
+      adminId: adminId,
       bitSize: data.bitSize,
       casting: data.casting,
       clientId: data.clientId,
@@ -54,6 +58,7 @@ export class WellService {
       totalDepth: data.totalDepth,
       treeSpecs: data.treeSpecs,
       turbingSize: data.turbingSize,
+      wellType: data.wellType,
     });
   }
 

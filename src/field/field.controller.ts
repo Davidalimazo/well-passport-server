@@ -30,13 +30,11 @@ export class FieldController {
   getAllClientFields(
     @Param('clientId') clientId: string,
   ): Promise<Field[] | null> {
-    console.log(clientId);
     return this.fieldService.getClientFields(clientId);
   }
 
   @Delete('client/:clientId')
   deleteAllFieldByClientId(@Param('clientId') clientId: string): Promise<any> {
-    console.log(clientId);
     return this.fieldService.deleteAllFieldClientById(clientId);
   }
 
@@ -46,7 +44,7 @@ export class FieldController {
   }
 
   @Post()
-  @UsePipes(new JoiValidationPipe(createFieldSchema))
+  // @UsePipes(new JoiValidationPipe(createFieldSchema))
   createUser(
     @Request() req,
     @Body() client: IFieldCreateRequest,

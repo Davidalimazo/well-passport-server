@@ -12,21 +12,27 @@ import { ReportModule } from './report/report.module';
 import { RecycleModule } from './recycle/recycle.module';
 import configuration from 'config/configuration';
 
-
-
-
-
 @Module({
-  imports: [ConfigModule.forRoot({
-    load:[configuration],
-    isGlobal:true
-  }), MongooseModule.forRootAsync({
-    inject:[ConfigService],
-    useFactory:async(configService:ConfigService)=>({
-      uri:configService.get('database.uri'),
-      dbName:configService.get("database.dbName")
-    })
-  }), AuthModule, ClientModule, FieldModule, WellModule, ProjectModule, ReportModule, RecycleModule],
+  imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('database.uri'),
+        dbName: configService.get('database.dbName'),
+      }),
+    }),
+    AuthModule,
+    ClientModule,
+    FieldModule,
+    WellModule,
+    ProjectModule,
+    ReportModule,
+    RecycleModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

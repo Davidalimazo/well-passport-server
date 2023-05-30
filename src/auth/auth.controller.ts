@@ -51,6 +51,7 @@ export class AuthController {
     return this.authService.getAllUsers();
   }
 
+  @Public()
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post()
@@ -59,7 +60,7 @@ export class AuthController {
     @Request() request,
     @Body() user: IAccount,
   ): Promise<IResponse | null> {
-    return this.authService.createUser(user, request.user?._id);
+    return this.authService.createUser(user);
   }
 
   @UseGuards(AuthGuard)

@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
   UsePipes,
-  Request
+  Request,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { Project } from './schema/project.schema';
@@ -33,12 +33,17 @@ export class ProjectController {
     console.log(clientId);
     return this.projectService.getClientProjects(clientId);
   }
+  @Get('well/:wellId')
+  getAllWellProjects(
+    @Param('wellId') wellId: string,
+  ): Promise<Project[] | null> {
+    return this.projectService.getWellProjects(wellId);
+  }
 
   @Delete('client/:clientId')
   deleteAllProjectByClientId(
     @Param('clientId') clientId: string,
   ): Promise<any> {
-    console.log(clientId);
     return this.projectService.deleteAllProjectClientById(clientId);
   }
 
@@ -48,9 +53,12 @@ export class ProjectController {
   }
 
   @Post()
-  @UsePipes(new JoiValidationPipe(createProjectSchema))
-  createUser(@Request() request, @Body() project: IProjectCreateRequest): Promise<Project | null> {
-    return this.projectService.createUser(project, request.user.user._id);
+  // @UsePipes(new JoiValidationPipe(createProjectSchema))
+  createUser(
+    @Request() request,
+    @Body() project: IProjectCreateRequest,
+  ): Promise<Project | null> {
+    return this.projectService.createUser(project, request.user._id);
   }
 
   @Delete(':projectId')

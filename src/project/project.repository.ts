@@ -32,6 +32,10 @@ export class ProjectRepository {
     return this.projectModel.find({ fieldId });
   }
 
+  async findProjectByWellId(wellId: string): Promise<Project[] | null> {
+    return this.projectModel.find({ wellId });
+  }
+
   async deleteAllProjectByClientId(clientId: string): Promise<any> {
     return this.projectModel.deleteMany({ clientId });
   }

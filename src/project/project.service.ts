@@ -31,6 +31,9 @@ export class ProjectService {
   async getClientProjects(clientId: string): Promise<Project[] | null> {
     return this.projectRepository.findProjectByClientId(clientId);
   }
+  async getWellProjects(wellId: string): Promise<Project[] | null> {
+    return this.projectRepository.findProjectByWellId(wellId);
+  }
   async getAllUsers(): Promise<Project[] | null> {
     return this.projectRepository.findAll({});
   }
@@ -50,6 +53,7 @@ export class ProjectService {
       rig: data.rig,
       startDate: data.startDate,
       wellId: data.wellId,
+      status: data.status,
     });
   }
 

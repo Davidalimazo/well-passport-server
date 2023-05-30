@@ -24,6 +24,9 @@ export class Well {
   clientId: string;
 
   @Prop({ required: true })
+  wellType: string;
+
+  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

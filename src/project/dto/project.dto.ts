@@ -33,6 +33,7 @@ export interface IProjectCreateRequest {
   startDate: Date;
   endDate: Date;
   wellId: string;
+  status: string;
 }
 
 export const createProjectSchema = Joi.object({
@@ -46,6 +47,8 @@ export const createProjectSchema = Joi.object({
   wellId: Joi.string().required(),
 
   rig: Joi.string().required(),
+
+  status: Joi.string().required(),
 
   image: Joi.string(),
 

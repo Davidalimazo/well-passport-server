@@ -62,7 +62,7 @@ export class AuthService {
   async getAllUsers(): Promise<IResponse[] | null> {
     return this.authRepository.findAll({});
   }
-  async createUser(data: IAccount, adminId: string): Promise<IResponse | any> {
+  async createUser(data: IAccount): Promise<IResponse | any> {
     const exist = await this.authRepository.findUserByEmail(data.email);
 
     if (exist)
@@ -81,7 +81,7 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
-      creatorId: adminId,
+      creatorId: 'SUPERUSER',
       image: data.image ? data.image : '',
       password: hashed,
       role: data.role,
@@ -116,7 +116,10 @@ export class AuthService {
       }
       const res = await this.authRepository.updateOne(userId, user);
       if (!res) new HttpException('User not found', HttpStatus.NOT_FOUND);
-      return res;
+      return {
+        message: 'Account Updated successfully',
+        token: '00',
+      };
     }
     return new HttpException('Not a valid user Id', HttpStatus.BAD_REQUEST);
   }
