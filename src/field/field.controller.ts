@@ -8,6 +8,8 @@ import {
   Post,
   UsePipes,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { FieldService } from './field.service';
 import { Field } from './schema/field.schema';
@@ -18,6 +20,8 @@ import {
 } from './dto/field.dto';
 import { Public } from 'src/utils/guard';
 import { JoiValidationPipe } from 'src/utils/validator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'config/multer.config';
 
 @Controller('field')
 export class FieldController {
@@ -45,11 +49,14 @@ export class FieldController {
 
   @Post()
   // @UsePipes(new JoiValidationPipe(createFieldSchema))
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
   createUser(
+    @UploadedFile() file: Express.Multer.File,
     @Request() req,
     @Body() client: IFieldCreateRequest,
-  ): Promise<Field | null> {
-    return this.fieldService.createUser(client, req.user._id);
+  ) {
+    const newField = { ...client, image: file.path };
+    return this.fieldService.createUser(newField, req.user._id);
   }
 
   @Delete(':fieldId')

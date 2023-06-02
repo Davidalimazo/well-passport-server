@@ -28,6 +28,11 @@ export class AuthService {
     if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
     return user;
   }
+  async getUserImageById(userId: string): Promise<any> {
+    const user = await this.authRepository.findOneByUserId(userId);
+    if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user.image;
+  }
   async login(data: ILogin): Promise<any> {
     const user = await this.authRepository.findUserByEmail(data.email);
     if (!user) return new HttpException('Invalid email', 401);
@@ -68,7 +73,19 @@ export class AuthService {
   async getAllUsers(): Promise<IResponse[] | null> {
     return this.authRepository.findAll({});
   }
-  async createUser(data: IAccount): Promise<IResponse | any> {
+  async uploadImage(userId: string, image: Partial<User>): Promise<any> {
+    if (this.authRepository.uploadImage(userId, image)) {
+      return {
+        message: 'profile picture uploaded successfully',
+        token: '00',
+      };
+    }
+    return new HttpException(
+      'error uploading your image',
+      HttpStatus.NOT_ACCEPTABLE,
+    );
+  }
+  async createUser(data: IAccount, adminId: string): Promise<IResponse | any> {
     const exist = await this.authRepository.findUserByEmail(data.email);
 
     if (exist)
@@ -87,7 +104,7 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
-      creatorId: 'SUPERUSER',
+      creatorId: adminId,
       image: data.image ? data.image : '',
       password: hashed,
       role: data.role,

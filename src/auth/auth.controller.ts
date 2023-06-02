@@ -10,7 +10,10 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { AuthService } from './auth.service';
 import { User } from './schema/users.schema';
@@ -28,6 +31,7 @@ import {
 import { JoiValidationPipe } from 'src/utils/validator';
 import { AuthGuard } from './auth.guard';
 import { Public } from 'src/utils/guard';
+import { multerConfig } from 'config/multer.config';
 
 @Controller('users')
 export class AuthController {
@@ -36,6 +40,11 @@ export class AuthController {
   @Get(':userId')
   getUserById(@Param('userId') userId: string): Promise<IResponse | null> {
     return this.authService.getUserById(userId);
+  }
+  @UseGuards(AuthGuard)
+  @Get('image/:userId')
+  getUserImageById(@Param('userId') userId: string): Promise<IResponse | null> {
+    return this.authService.getUserImageById(userId);
   }
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -60,7 +69,7 @@ export class AuthController {
     @Request() request,
     @Body() user: IAccount,
   ): Promise<IResponse | null> {
-    return this.authService.createUser(user);
+    return this.authService.createUser(user, request.user._id);
   }
 
   @UseGuards(AuthGuard)
@@ -81,5 +90,16 @@ export class AuthController {
     @Body() user: Partial<UpdateDto>,
   ): Promise<IResponse | null> {
     return this.authService.updateUser(userId, user);
+  }
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
+  @Patch('upload-image/:userId')
+  uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('userId') userId: string,
+  ) {
+    const updateRecords = { image: file.path };
+    return this.authService.uploadImage(userId, updateRecords);
   }
 }

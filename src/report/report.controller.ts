@@ -8,6 +8,8 @@ import {
   Post,
   UsePipes,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { Report } from './schema/report.schema';
@@ -18,6 +20,8 @@ import {
 } from './dto/report.dto';
 import { Public } from 'src/utils/guard';
 import { JoiValidationPipe } from 'src/utils/validator';
+import { multerConfig } from 'config/multer.config';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('report')
 export class ReportController {
@@ -30,13 +34,17 @@ export class ReportController {
   getAllClientReports(
     @Param('reportId') reportId: string,
   ): Promise<Report[] | null> {
-    console.log(reportId);
     return this.reportService.getClientReports(reportId);
+  }
+  @Get('project/:projectId')
+  getAllProjectReports(
+    @Param('projectId') projectId: string,
+  ): Promise<Report[] | null> {
+    return this.reportService.getProjectReports(projectId);
   }
 
   @Delete('client/:clientId')
   deleteAllReportByClientId(@Param('reportId') reportId: string): Promise<any> {
-    console.log(reportId);
     return this.reportService.deleteAllReportClientById(reportId);
   }
 
@@ -46,12 +54,16 @@ export class ReportController {
   }
 
   @Post()
-  @UsePipes(new JoiValidationPipe(createReportSchema))
+  // @UsePipes(new JoiValidationPipe(createReportSchema))
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
   createUser(
+    @UploadedFile() file: Express.Multer.File,
     @Request() request,
     @Body() report: IReportCreateRequest,
-  ): Promise<Report | null> {
-    return this.reportService.createUser(report, request.user.user._id);
+  ) {
+    const newReport = { ...report, image: file.path };
+
+    return this.reportService.createUser(newReport, request.user._id);
   }
 
   @Delete(':reportId')

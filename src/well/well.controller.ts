@@ -8,6 +8,8 @@ import {
   Post,
   UsePipes,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { WellService } from './well.service';
 import { Well } from './schema/well.schema';
@@ -18,6 +20,8 @@ import {
 } from './dto/well.dto';
 import { Public } from 'src/utils/guard';
 import { JoiValidationPipe } from 'src/utils/validator';
+import { multerConfig } from 'config/multer.config';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('well')
 export class WellController {
@@ -30,13 +34,11 @@ export class WellController {
   getAllClientWells(
     @Param('clientId') clientId: string,
   ): Promise<Well[] | null> {
- 
     return this.wellService.getClientWells(clientId);
   }
 
   @Delete('client/:clientId')
   deleteAllWellByClientId(@Param('clientId') clientId: string): Promise<any> {
-    
     return this.wellService.deleteAllWellClientById(clientId);
   }
 
@@ -57,11 +59,14 @@ export class WellController {
 
   @Post()
   // @UsePipes(new JoiValidationPipe(createWellSchema))
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
   createUser(
+    @UploadedFile() file: Express.Multer.File,
     @Request() request,
     @Body() well: IWellCreateRequest,
-  ): Promise<Well | null> {
-    return this.wellService.createUser(well, request.user._id);
+  ) {
+    const newWell = { ...well, image: file.path };
+    return this.wellService.createUser(newWell, request.user._id);
   }
 
   @Delete(':wellId')

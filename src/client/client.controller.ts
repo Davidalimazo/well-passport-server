@@ -8,6 +8,8 @@ import {
   Post,
   UsePipes,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { Client } from './schema/client.schema';
@@ -18,6 +20,8 @@ import {
 } from './dto/client.dto';
 import { Public } from 'src/utils/guard';
 import { JoiValidationPipe } from 'src/utils/validator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'config/multer.config';
 
 @Controller('client')
 export class ClientController {
@@ -34,12 +38,15 @@ export class ClientController {
 
   @Post()
   // @UsePipes(new JoiValidationPipe(createClientSchema))
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
   createUser(
+    @UploadedFile() file: Express.Multer.File,
     @Request() request,
     @Body() client: IClientCreateRequest,
-  ): Promise<Client | null> {
-    console.log(client);
-    return this.clientService.createUser(client, request.user._id);
+  ) {
+    const newClient = { ...client, image: file.path };
+
+    return this.clientService.createUser(newClient, request.user._id);
   }
 
   @Delete(':clientId')

@@ -31,6 +31,9 @@ export class ReportService {
   async getClientReports(reportId: string): Promise<Report[] | null> {
     return this.reportRepository.findReportByClientId(reportId);
   }
+  async getProjectReports(reportId: string): Promise<Report[] | null> {
+    return this.reportRepository.findReportByProjectId(reportId);
+  }
   async getAllUsers(): Promise<Report[] | null> {
     return this.reportRepository.findAll({});
   }

@@ -11,7 +11,8 @@ export class AuthRepository {
   ) {}
 
   async findOneByUserId(userId: string): Promise<User | null> {
-    return this.userModel.findOne({ userId });
+    const objectId = new mongoose.Types.ObjectId(userId);
+    return this.userModel.findById(objectId);
   }
   async findOneByObjectId(id: string): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(id);
@@ -34,6 +35,14 @@ export class AuthRepository {
   async create(user: IUsers): Promise<IResponse> {
     const newUser = new this.userModel(user);
     return newUser.save();
+  }
+
+  async uploadImage(userId: string, image: Partial<User>): Promise<any> {
+    const objectId = new mongoose.Types.ObjectId(userId);
+    if (!isValidObjectId(objectId)) return false;
+    const user = await this.userModel.findById(objectId);
+    if (!user) return false;
+    return this.userModel.findOneAndUpdate(objectId, image);
   }
 
   async updateOne(id: string, user: Partial<User>): Promise<IResponse | null> {

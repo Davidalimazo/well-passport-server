@@ -11,9 +11,16 @@ import { ProjectModule } from './project/project.module';
 import { ReportModule } from './report/report.module';
 import { RecycleModule } from './recycle/recycle.module';
 import configuration from 'config/configuration';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../'),
+      renderPath: '/uploads',
+    }),
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
@@ -23,6 +30,11 @@ import configuration from 'config/configuration';
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('database.uri'),
         dbName: configService.get('database.dbName'),
+      }),
+    }),
+    MulterModule.registerAsync({
+      useFactory: () => ({
+        dest: './uploads',
       }),
     }),
     AuthModule,

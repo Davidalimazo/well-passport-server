@@ -8,6 +8,8 @@ import {
   Post,
   UsePipes,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { Project } from './schema/project.schema';
@@ -18,6 +20,8 @@ import {
 } from './dto/project.dto';
 import { Public } from 'src/utils/guard';
 import { JoiValidationPipe } from 'src/utils/validator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'config/multer.config';
 
 @Controller('project')
 export class ProjectController {
@@ -54,11 +58,14 @@ export class ProjectController {
 
   @Post()
   // @UsePipes(new JoiValidationPipe(createProjectSchema))
+  @UseInterceptors(FileInterceptor('file', { ...multerConfig }))
   createUser(
+    @UploadedFile() file: Express.Multer.File,
     @Request() request,
     @Body() project: IProjectCreateRequest,
-  ): Promise<Project | null> {
-    return this.projectService.createUser(project, request.user._id);
+  ) {
+    const newProject = { ...project, image: file.path };
+    return this.projectService.createUser(newProject, request.user._id);
   }
 
   @Delete(':projectId')

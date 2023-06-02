@@ -25,6 +25,9 @@ export class ReportRepository {
   async findReportByClientId(clientId: string): Promise<Report[] | null> {
     return this.reportModel.find({ clientId });
   }
+  async findReportByProjectId(projectId: string): Promise<Report[] | null> {
+    return this.reportModel.find({ projectId });
+  }
 
   async findReportByFieldId(fieldId: string): Promise<Report[] | null> {
     return this.reportModel.find({ fieldId });
