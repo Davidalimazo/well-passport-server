@@ -9,7 +9,7 @@ export default () => ({
   emailPort: parseInt(process.env.EMAIL_SERVER_HOST, 10) || 465,
   mailFrom: process.env.EMAIL_FROM,
   database: {
-    uri: process.env.MONGO_URI,
+    uri: process.env.DATABASE_URL,
     dbName: process.env.MONGO_DB_NAME,
   },
 });

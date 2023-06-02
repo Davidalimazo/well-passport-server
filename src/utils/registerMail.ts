@@ -18,7 +18,10 @@ export class MailNotification {
     role: string,
     name: string,
   ) {
-    const { href } = new URL('login', 'http://localhost:3000');
+    const { href } = new URL(
+      'login',
+      'https://well-passport-server-production.up.railway.app/api/v1/users',
+    );
 
     const transport = createTransport({
       host: this.configService.get('emailHost'),
