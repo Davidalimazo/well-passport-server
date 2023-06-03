@@ -20,7 +20,7 @@ export class MailNotification {
   ) {
     const { href } = new URL(
       'login',
-      'https://well-passport-server-production.up.railway.app/api/v1/users',
+      'https://well-passport-frontend.vercel.app/',
     );
 
     const transport = createTransport({
