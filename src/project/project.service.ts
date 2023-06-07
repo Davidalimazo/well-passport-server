@@ -29,10 +29,9 @@ export class ProjectService {
         if (err) {
           console.error(err);
           return err;
-        } else {
-          return this.projectRepository.findOneAndDelete(clientId);
         }
       });
+      return this.projectRepository.findOneAndDelete(clientId);
     }
 
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);

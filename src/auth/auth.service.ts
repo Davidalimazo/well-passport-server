@@ -79,11 +79,11 @@ export class AuthService {
         if (err) {
           console.error(err);
           return err;
-        } else {
-          return this.authRepository.findOneAndDelete(userId);
         }
       });
+      return this.authRepository.findOneAndDelete(userId);
     }
+    return new HttpException('error deleting user', HttpStatus.NOT_ACCEPTABLE);
   }
   async getAllUsers(): Promise<IResponse[] | null> {
     return this.authRepository.findAll({});

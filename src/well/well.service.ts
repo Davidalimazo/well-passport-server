@@ -30,10 +30,9 @@ export class WellService {
         if (err) {
           console.error(err);
           return err;
-        } else {
-          return this.wellRepository.findOneAndDelete(clientId);
         }
       });
+      return this.wellRepository.findOneAndDelete(clientId);
     }
 
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);

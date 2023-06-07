@@ -29,10 +29,9 @@ export class FieldService {
         if (err) {
           console.error(err);
           return err;
-        } else {
-          return this.fieldRepository.findOneAndDelete(clientId);
         }
       });
+      return this.fieldRepository.findOneAndDelete(clientId);
     }
 
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);
