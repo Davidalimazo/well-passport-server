@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { FieldRepository } from './field.repository';
 import { Field } from './schema/field.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   IField,
   IFieldCreateRequest,
@@ -18,8 +20,21 @@ export class FieldService {
     return this.fieldRepository.findOne({ fieldId });
   }
   async deleteFieldById(clientId: string): Promise<any> {
-    if (isValidObjectId(clientId))
-      return this.fieldRepository.findOneAndDelete(clientId);
+    if (isValidObjectId(clientId)) {
+      const report = await this.fieldRepository.findOne({ _id: clientId });
+
+      let img = report.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        } else {
+          return this.fieldRepository.findOneAndDelete(clientId);
+        }
+      });
+    }
+
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);
   }
   async deleteAllFieldClientById(clientId: string): Promise<any> {

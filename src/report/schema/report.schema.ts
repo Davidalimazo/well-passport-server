@@ -31,7 +31,6 @@ export class Report {
 
   @Prop()
   image: string;
-
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report);

@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ProjectRepository } from './project.repository';
 import { Project } from './schema/project.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   IProject,
   IProjectCreateRequest,
@@ -18,8 +20,21 @@ export class ProjectService {
     return this.projectRepository.findOne({ projectId });
   }
   async deleteProjectById(clientId: string): Promise<any> {
-    if (isValidObjectId(clientId))
-      return this.projectRepository.findOneAndDelete(clientId);
+    if (isValidObjectId(clientId)) {
+      const report = await this.projectRepository.findOne({ _id: clientId });
+
+      let img = report.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        } else {
+          return this.projectRepository.findOneAndDelete(clientId);
+        }
+      });
+    }
+
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);
   }
   async deleteAllProjectClientById(clientId: string): Promise<any> {

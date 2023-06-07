@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ClientRepository } from './client.repository';
 import { Client } from './schema/client.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   IClient,
   IClientCreateRequest,
@@ -22,8 +24,18 @@ export class ClientService {
     return this.clientRepository.findOne({ clientId });
   }
   async deleteClientById(clientId: string): Promise<any> {
-    if (!isValidObjectId(clientId))
-      return new HttpException('Not a valid Id', HttpStatus.BAD_REQUEST);
+    if (isValidObjectId(clientId)) {
+      const client = await this.clientRepository.findOne({ _id: clientId });
+
+      let img = client.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+    }
 
     const res = await this.clientRepository.findOneAndDelete(clientId);
 

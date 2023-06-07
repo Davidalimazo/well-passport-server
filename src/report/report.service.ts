@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ReportRepository } from './report.repository';
 import { Report } from './schema/report.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   IReport,
   IReportCreateRequest,
@@ -18,8 +20,21 @@ export class ReportService {
     return this.reportRepository.findOne({ reportId });
   }
   async deleteReportById(reportId: string): Promise<any> {
-    if (isValidObjectId(reportId))
-      return this.reportRepository.findOneAndDelete(reportId);
+    if (isValidObjectId(reportId)) {
+      const report = await this.reportRepository.findOne({ _id: reportId });
+
+      let img = report.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        } else {
+          return this.reportRepository.findOneAndDelete(reportId);
+        }
+      });
+    }
+
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);
   }
   async deleteAllReportClientById(reportId: string): Promise<any> {

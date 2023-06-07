@@ -2,6 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { WellRepository } from './well.repository';
 import { Well } from './schema/well.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
+
 import {
   IWell,
   IWellCreateRequest,
@@ -18,8 +21,21 @@ export class WellService {
     return this.wellRepository.findOne({ wellId });
   }
   async deleteWellById(clientId: string): Promise<any> {
-    if (isValidObjectId(clientId))
-      return this.wellRepository.findOneAndDelete(clientId);
+    if (isValidObjectId(clientId)) {
+      const well = await this.wellRepository.findOne({ _id: clientId });
+
+      let img = well.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        } else {
+          return this.wellRepository.findOneAndDelete(clientId);
+        }
+      });
+    }
+
     return new HttpException('not a valid id', HttpStatus.BAD_REQUEST);
   }
   async deleteAllWellClientById(clientId: string): Promise<any> {
@@ -38,7 +54,10 @@ export class WellService {
   async getAllUsers(): Promise<Well[] | null> {
     return this.wellRepository.findAll({});
   }
-  async createUser(data: IWellCreateRequest, adminId:string): Promise<Well | null> {
+  async createUser(
+    data: IWellCreateRequest,
+    adminId: string,
+  ): Promise<Well | null> {
     return this.wellRepository.create({
       wellId: uuidv4(),
       adminId: adminId,

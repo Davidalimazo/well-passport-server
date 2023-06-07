@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { User } from './schema/users.schema';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   IAccount,
   ILogin,
@@ -67,8 +69,21 @@ export class AuthService {
     };
   }
 
-  async deleteUserById(userId: string): Promise<IResponse | null> {
-    return this.authRepository.findOneAndDelete(userId);
+  async deleteUserById(userId: string): Promise<any> {
+    if (isValidObjectId(userId)) {
+      const user = await this.authRepository.findOneByObjectId(userId);
+
+      let img = user.image.split('\\')[1];
+
+      fs.unlink(path.join('uploads/' + img), (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        } else {
+          return this.authRepository.findOneAndDelete(userId);
+        }
+      });
+    }
   }
   async getAllUsers(): Promise<IResponse[] | null> {
     return this.authRepository.findAll({});
